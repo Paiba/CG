@@ -64,8 +64,11 @@ void display(void){
 	glClear(GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
 	if(desenha){
-		glBegin(GL_POINTS);
-		glVertex2i(xm,ym);
+		glBegin(GL_POLYGON);
+		glVertex2f(xm,ym);
+		glVertex2f(xm+100,ym);
+		glVertex2f(xm+100,ym+100);
+		glVertex2f(xm,ym+100);
 		glEnd();
 	}
 

@@ -6,9 +6,10 @@ void display(void);
 void init(void);
 void reshape(int, int);
 void desenhaBola(int, int, int, int);
+void arrasta(int int)
 
 float r,g,b, xm, ym;
-bool desenha = false;
+bool circulo = false;
 //****MAIN*****//
 
 
@@ -34,31 +35,6 @@ int main(int argc, char**argv)
 	return 0;
 }
 
-void desenhaBola(int button, int  state, int x, int y){
-	
-	if(button ==  GLUT_LEFT_BUTTON && state==GLUT_DOWN){
-		desenha = true;
-		xm = x;
-		ym = 480-y;	
-		r=0.5;
-		g=0.5;
-		b=0.0;	
-	}
-	if(button== GLUT_RIGHT_BUTTON){
-	
-	}
-	glutPostRedisplay();
-}
-
-void reshape(int w, int h){
-	
-	glViewport(0,0,w,h);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(-10,10,-10,10);
-	glMatrixMode(GL_MODELVIEW);
-	
-}
 
 void display(void){
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -83,3 +59,35 @@ void init (void)
 	glLoadIdentity();
 	glOrtho(0.0, 1.0, 0.0, 1.0,-1.0, 1.0);
 }
+
+
+void reshape(int w, int h){
+	
+	glViewport(0,0,w,h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(-10,10,-10,10);
+	glMatrixMode(GL_MODELVIEW);
+	
+}
+
+void desenhaBola(int button, int  state, int x, int y){
+	
+	if(button ==  GLUT_LEFT_BUTTON && state==GLUT_DOWN){
+		circulo = true;
+		x_ = x;
+		y_ = 480-y;	
+		r=0.5;
+		g=0.5;
+		b=0.0;	
+	}
+	if(button== GLUT_RIGHT_BUTTON){
+	
+	}
+	glutPostRedisplay();
+}
+
+void arrasta(int x, int y){
+
+}
+
