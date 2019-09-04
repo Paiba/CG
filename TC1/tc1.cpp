@@ -4,7 +4,11 @@
 
 void display(void);
 void init(void);
+void reshape(int, int);
+void desenhaBola(int, int, int, int);
 
+float r,g,b, xm, ym;
+bool desenha = false;
 //****MAIN*****//
 
 
@@ -21,6 +25,8 @@ int main(int argc, char**argv)
 	//Callbacks
 	init();
 	glutDisplayFunc(display);
+	glutMouseFunc(desenhaBola);
+	glutReshapeFunc(reshape);
 
 	//Main Loop 
 	glutMainLoop();
@@ -28,18 +34,45 @@ int main(int argc, char**argv)
 	return 0;
 }
 
+void desenhaBola(int button, int  state, int x, int y){
+	
+	if(button ==  GLUT_LEFT_BUTTON && state==GLUT_DOWN){
+		desenha = true;
+		xm = x;
+		ym = 480-y;	
+		r=0.5;
+		g=0.5;
+		b=0.0;	
+	}
+	if(button== GLUT_RIGHT_BUTTON){
+	
+	}
+	glutPostRedisplay();
+}
+
+void reshape(int w, int h){
+	
+	glViewport(0,0,w,h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(-10,10,-10,10);
+	glMatrixMode(GL_MODELVIEW);
+	
+}
+
 void display(void){
 	glClear(GL_COLOR_BUFFER_BIT);
-	glLoadIdentidy();
+	glLoadIdentity();
+	if(desenha){
+		glBegin(GL_POLYGON);
+		glVertex2f(xm,ym);
+		glVertex2f(xm+100,ym);
+		glVertex2f(xm+100,ym+100);
+		glVertex2f(xm,ym+100);
+		glEnd();
+	}
 
-	glColor3f (1.0, 1.0, 1.0);
-	glBegin(GL_POLYGON);
-	glVertex3f (0.25, 0.25, 0.0);
-	glVertex3f (0.75, 0.25, 0.0);
-	glVertex3f (0.75, 0.75, 0.0);
-	glVertex3f (0.25, 0.75, 0.0);
-	glEnd();
-
+	
 	glFlush();
 }
 
