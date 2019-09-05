@@ -1,15 +1,25 @@
+#include <stdio.h>
+#include <math.h>
+#include <GL/gl.h>
 #include <GL/glut.h>
+#include <iostream>
+#include <unistd.h>
 
+#define PI 3.1415926535
 //*****FUNÇÕES QUE SERÃO UTILIZADAS*****//
+
+int i, circle_points = 1000;
+float angle, raio;
+float gx = 0,gy = 0,passo = 0.0005;
+float gxm = 0.05, gym = 0.05;
+int wzx = 800, wzy = 800;
 
 void display(void);
 void init(void);
-void reshape(int, int);
-void desenhaBola(int, int, int, int);
-void arrasta(int int)
+void mouse(int, int, int, int);
+void idle(void);
 
-float r,g,b, xm, ym;
-bool circulo = false;
+
 //****MAIN*****//
 
 
@@ -18,16 +28,17 @@ int main(int argc, char**argv)
 	//Modos da janela
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE |GLUT_RGB);
-	glutInitWindowSize(500, 500); 
+	glutInitWindowSize(wzx, wzy); 
 	glutInitWindowPosition(100, 100);
 	glutCreateWindow("TC1");
 	
 
 	//Callbacks
+	glutIdleFunc(idle);
+	glutMouseFunc(mouse);
 	init();
 	glutDisplayFunc(display);
-	glutMouseFunc(desenhaBola);
-	glutReshapeFunc(reshape);
+	
 
 	//Main Loop 
 	glutMainLoop();
@@ -35,18 +46,23 @@ int main(int argc, char**argv)
 	return 0;
 }
 
+void idle(void){
+    glutPostRedisplay();
+}
 
 void display(void){
 	glClear(GL_COLOR_BUFFER_BIT);
-	glLoadIdentity();
-	if(desenha){
-		glBegin(GL_POLYGON);
-		glVertex2f(xm,ym);
-		glVertex2f(xm+100,ym);
-		glVertex2f(xm+100,ym+100);
-		glVertex2f(xm,ym+100);
-		glEnd();
+	glColor3f(1.0,0,1.0);
+	glBegin(GL_POLYGON);
+	glColor3f(0.13, 0.55, 40);
+	raio = 0.1;
+	for(i = 0; i < circle_points; i++) {
+		angle = (2*PI*i)/circle_points;
+		glVertex2f(gxm+raio*cos(angle),gym+raio*sin(angle));
 	}
+	glEnd();
+
+    glEnd();
 
 	
 	glFlush();
@@ -61,33 +77,14 @@ void init (void)
 }
 
 
-void reshape(int w, int h){
-	
-	glViewport(0,0,w,h);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(-10,10,-10,10);
-	glMatrixMode(GL_MODELVIEW);
-	
-}
 
-void desenhaBola(int button, int  state, int x, int y){
+void mouse(int button, int  state, int x, int y){
 	
-	if(button ==  GLUT_LEFT_BUTTON && state==GLUT_DOWN){
-		circulo = true;
-		x_ = x;
-		y_ = 480-y;	
-		r=0.5;
-		g=0.5;
-		b=0.0;	
-	}
-	if(button== GLUT_RIGHT_BUTTON){
-	
-	}
+	y = wzy - y;
+    gxm = (float) x / wzx;
+    gym = (float) y / wzy;
 	glutPostRedisplay();
 }
 
-void arrasta(int x, int y){
 
-}
 
