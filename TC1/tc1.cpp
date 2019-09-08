@@ -13,7 +13,7 @@ int i, circle_points = 1000;
 float angle, raio;
 float gx = 0,gy = 0;
 float gxm = 0.05, gym = 0.05;
-float gxmf = 0.05, gymf = 0.05;
+float gxmf = 0.0, gymf = 0.0;
 int wzx = 500, wzy = 500;
 
 //vetor dos circulos
@@ -44,7 +44,7 @@ int main(int argc, char**argv)
 
 	//Callbacks
 	glutIdleFunc(idle);
-	glutMouseFunc(mouse);
+	
 	init();
 	glutDisplayFunc(display);
 	
@@ -59,6 +59,7 @@ int main(int argc, char**argv)
 
 void idle(void){
     glutPassiveMotionFunc(cursorFormat);
+    glutMouseFunc(mouse);
     glutPostRedisplay();
 }
 

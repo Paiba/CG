@@ -1,8 +1,8 @@
 all:
-	g++ tc1.cpp -o tela -lGL -lGLU -lglut -lc -lm
+	g++ tc1.cpp -o trabalhocg -lGL -lGLU -lglut -lc -lm
 
 run:
-	./tela
+	./trabalhocg
 
 clean:
 	rm -rf tela
