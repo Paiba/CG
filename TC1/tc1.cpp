@@ -46,6 +46,7 @@ void display(void);
 void init(void);
 void mouse(int, int, int, int);
 void cursorFormat(int, int);
+void arrasta(int, int);
 void idle(void);
 
 
@@ -138,6 +139,6 @@ void mouse(int button, int  state, int x, int y){
         glutPostRedisplay();
 }
 
-
-
-
+void arrasta(int x, int y){
+    
+}
