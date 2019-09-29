@@ -21,7 +21,6 @@ string tip;
 string caminh;
 string caminhoInteiro;
 
-
 class Circulo{
 private:
     int pos_x;
@@ -30,16 +29,20 @@ private:
     int id;
     string cor;
 public:
-    Circulo(int x, int y, int iD, int raio, string fill);
+    Circulo();
+    void setAtt(int x, int y, int iD, int raio, string fill);
 };
 
-Circulo::Circulo(int x, int y, int iD, int raio, string fill){
+Circulo::Circulo(){}
+
+void Circulo::setAtt(int x, int y, int iD, int raio, string fill){
     pos_x = x;
     pos_y = y;
     radius = raio;
     id = iD; 
     cor = fill;
 }
+
 
 struct pista{
     int pos1_x;
@@ -49,6 +52,8 @@ struct pista{
     int id;
 };
 
+Circulo JOGADOR;
+Circulo ARENA;
 
 pista pistaDeVoo1;
 
@@ -78,8 +83,19 @@ void read_xml(char* FileName){
     while(svgCirc){
         string fill;
         fill = svgCirc->Attribute("fill");
-        if(fill == "green"){
-                printf("Player!");
+        if(fill == "green"){//Player
+            //printf("Player!\n");
+            PLAYER.setAtt(svgCirc->IntAttribute("cx"),svgCirc->IntAttribute("cy"),svgCirc->IntAttribute("id"),svgCirc->IntAttribute("r"),svgCirc->Attribute("fill"),);
+            
+        }
+        if (fill == "blue"){//Arena 
+            //printf("Arena!\n");
+        }
+        if (fill == "red"){//Inimigo Aéreo
+            //printf("Aereo!\n");
+        }
+        if (fill == "orange"){//Inimigo Terrestre
+            //printf("Terrestre!\n");
         }
         svgCirc = svgCirc->NextSiblingElement("circle");
             
@@ -98,4 +114,33 @@ void read_xml(char* FileName){
 int main(int argc, char**argv)
 {
     read_xml(argv[1]);
+    
+glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_SINGLE |GLUT_RGB);
+	glutInitWindowSize(500, 500); 
+	glutInitWindowPosition(100, 100);
+	glutCreateWindow("Trabalho2");
+	
+
+	//Callbacks	
+	init();
+	glutDisplayFunc(display);
+   
+    //Main Loop 
+	glutMainLoop();
+	return 0;
+}
+
+void display(void){
+    
+    
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(0,0,0);
+    glBegin(GL_LINE_LOOP);
+    glColor3f(0, 1, 0);
+    angle = (2*PI*i)/1000;
+	glVertex2f(PLAYER->pos_x+PLAYER->raio*cos(angle),PLAYER->pos_y+PLAYER->raio*sin(angle));
+	
+ 	
+	glFlush();
 }
