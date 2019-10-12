@@ -103,13 +103,13 @@ int main(int argc, char**argv)
 	glutInitWindowSize(wzx, wzy); 
 	glutInitWindowPosition(100, 100);
 	glutCreateWindow(titulo.c_str());
-	
+	glutIdleFunc(idle);
 	
 
 	//Callbacks	
 	init();
 	glutDisplayFunc(display);
-   	glutIdleFunc(idle);
+   
 	glutMotionFunc(arrasta);
      glutMouseFunc(mouse);
     glutPassiveMotionFunc(cursorFormat);
