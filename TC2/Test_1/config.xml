@@ -1,8 +1,0 @@
-<aplicacao>
-	<arquivoDaArena>
-		<nome>arena</nome>
-		<tipo>svg</tipo>
-		<caminho>/home/pedro/CG/TC2/Test_1/</caminho>
-	</arquivoDaArena>
-	<jogador vel="0.1"></jogador>
-</aplicacao>
