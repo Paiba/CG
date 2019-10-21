@@ -1,10 +1,13 @@
 all: full
 
-full: tiny.o tc2.o
-	g++ tc2.o tinyxml2.o -lGL -lGLU -lglut -lm -o trabalhocg
+full: tiny.o nave.o tc3.o
+	g++ nave.o tc3.o tinyxml2.o -lGL -lGLU -lglut -lm -o trabalhocg
 
-tc2.o:
-	g++ -g -c tc2.cpp -o tc2.o
+tc3.o:
+	g++ -g -c tc3.cpp -o tc3.o
+
+nave.o:
+	g++ -g -c nave.cpp -o nave.o
 
 tiny.o:
 	g++ -c tinyxml2.cpp

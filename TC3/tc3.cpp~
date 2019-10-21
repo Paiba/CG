@@ -274,7 +274,7 @@ void display(void){
         	glVertex2f(INIMIGO_A[j].pos_x+INIMIGO_A[j].radius*cos(angle),INIMIGO_A[j].pos_y+INIMIGO_A[j].radius*sin(angle));
         }
         glEnd();*/
-		INIMIGO_A[j].desenhaNave(angle, circle_points);
+		INIMIGO_T[j].desenhaNave(angle, circle_points);
     }
 	//INIMIGO_T
 	for(int j=0; j<(INIMIGO_T.size()); j++){                

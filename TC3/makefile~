@@ -1,0 +1,13 @@
+all: full
+
+full: tiny.o tc3.o
+	g++ tc3.o tinyxml2.o -lGL -lGLU -lglut -lm -o trabalhocg
+
+tc3.o:
+	g++ -g -c tc3.cpp -o tc3.o
+
+tiny.o:
+	g++ -c tinyxml2.cpp
+
+clean:
+	rm -f *.o trabalhocg
