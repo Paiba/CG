@@ -26,21 +26,27 @@ void Nave::setAtt(float x, float y, int iD, float raio, string fill){
     cor = fill;
 }
 
-void Nave::desenhaNave(float angle, int circle_points){
+void Nave::desenhaCirculoEli(float raio, float r, float g, float b, float elip){
+	glColor3f(r, g, b);	
 	glBegin(GL_POLYGON);
-	if(cor == "red")
-	glColor3f(1, 0, 0);
-	if(cor == "green")
-    glColor3f(0, 1, 0);
-	if(cor =="orange")
-	glColor3f(1, 0.5, 0);
+	for(int i = 0; i < 1000; i++) {
+    		float angle = (2*3.14*i)/1000;
+			glVertex2f(pos_x+radius*cos(angle),pos_y+elip*radius*sin(angle));	
+	}		
+	glEnd();
+}
 
-	for(int i = 0; i < circle_points; i++) {
-    	angle = (2*PI*i)/circle_points;
-		glVertex2f(pos_x+radius*cos(angle),pos_y+radius*sin(angle));	
-	}	
-	glEnd();	
- 	
-	glutPostRedisplay();
-	glFlush();
+void Nave::desenhaNave(){
+	
+	if(cor == "green"){
+		desenhaCirculoEli(radius,1,1,1,1);
+		desenhaCirculoEli(radius,0,1,0,0.3);
+	}
+	if(cor == "red"){
+		desenhaCirculoEli(radius,1,0,0,1);
+	}
+	if(cor =="orange"){
+		desenhaCirculoEli(radius,1,0.5,0,1);
+	}
+	
 }

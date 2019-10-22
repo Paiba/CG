@@ -176,6 +176,7 @@ void keyPressDown(unsigned char key, int x, int y)
 void idle(void){
 	float VelFin;
 	float meio = pistaDeVoo1.pos1_x + pistaDeVoo1.distx/2;
+	VelFin = velocidade*4000*(pistaDeVoo1.distAbs*2)/pow(4000,2);
 	if(ready && !decolado){
 		if(glutGet(GLUT_ELAPSED_TIME)-t0<=4000){
 			t1 = (glutGet(GLUT_ELAPSED_TIME)-t0);			
@@ -188,7 +189,7 @@ void idle(void){
 		else {decolado = true;}
 	}
 	
-	VelFin = velocidade*4000*(pistaDeVoo1.distAbs*2)/pow(4000,2);
+	
 
 	if((keyStatus['w'] || keyStatus['W']) && decolado && distanciaAereo(JOGADOR.pos_x,JOGADOR.pos_y-VelFin)
 	&& distanciaArena(JOGADOR.pos_x,JOGADOR.pos_y-VelFin))
@@ -245,7 +246,7 @@ void idle(void){
 
 void display(void){
     
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glColor3f(1,1,1);
 	
 	//ARENA
@@ -267,29 +268,17 @@ void display(void){
 
 	//INIMIGO_A
 	for(int j=0; j<(INIMIGO_A.size()); j++){                
-    	/*glBegin(GL_POLYGON);
-        glColor3f(1, 0, 0);
-        for(i = 0; i < circle_points; i++) {
-        	angle = (2*PI*i)/circle_points;
-        	glVertex2f(INIMIGO_A[j].pos_x+INIMIGO_A[j].radius*cos(angle),INIMIGO_A[j].pos_y+INIMIGO_A[j].radius*sin(angle));
-        }
-        glEnd();*/
-		INIMIGO_A[j].desenhaNave(angle, circle_points);
+    	INIMIGO_A[j].desenhaNave();
     }
 	//INIMIGO_T
 	for(int j=0; j<(INIMIGO_T.size()); j++){                
-    	/*glBegin(GL_POLYGON);
-        glColor3f(1, 0.5, 0);
-        for(i = 0; i < circle_points; i++) {
-        	angle = (2*PI*i)/circle_points;
-        	glVertex2f(INIMIGO_T[j].pos_x+INIMIGO_T[j].radius*cos(angle),INIMIGO_T[j].pos_y+INIMIGO_T[j].radius*sin(angle));
-        }
-        glEnd();*/
-		INIMIGO_T[j].desenhaNave(angle, circle_points);
+		INIMIGO_T[j].desenhaNave();
     }
 
 	//JOGADOR
-    JOGADOR.desenhaNave(angle, circle_points);
+    JOGADOR.desenhaNave();
+	glutPostRedisplay();
+	glFlush();
 }
 
 bool distanciaArena(float x, float y){

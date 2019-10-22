@@ -11,6 +11,7 @@ public:
 
     Nave();
     void setAtt(float x, float y, int iD, float raio, string fill);
-	void desenhaNave(float angle, int circle_points);
+	void desenhaCirculoEli(float raio, float r, float g, float b, float elip);
+	void desenhaNave();
 };
 
