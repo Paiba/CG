@@ -27,13 +27,15 @@ float angle;
 int i, circle_points = 1000;
 float t0, t1, t2;
 
+
 bool distanciaAereo(float, float);
 bool distanciaArena(float, float);
 bool decolado = false;
 bool keyStatus[255];
 bool ready = false;
+bool move =  false;
 
-
+float VelRef;
 float velocidade;
 string nom;
 string tip;
@@ -48,7 +50,8 @@ struct pista{
     float pos2_y;
 	float distx;
 	float disty;
-	float distAbs; 
+	float distAbs;
+	float tangente; 
     int id;
 };
 
@@ -89,24 +92,24 @@ void read_xml(char* FileName){
         fill = svgCirc->Attribute("fill");
         if(fill == "green"){//JOGADOR
             //printf("JOGADOR!\n");
-            JOGADOR.setAtt(svgCirc->FloatAttribute("cx"),svgCirc->FloatAttribute("cy"),svgCirc->IntAttribute("id"),svgCirc->FloatAttribute("r"),svgCirc->Attribute("fill"));
+            JOGADOR.setAtt(svgCirc->FloatAttribute("cx"),svgCirc->FloatAttribute("cy"),svgCirc->IntAttribute("id"),svgCirc->FloatAttribute("r"),svgCirc->Attribute("fill"),0);
 			TamFin = 2*svgCirc->FloatAttribute("r");
             
         }
         if (fill == "blue"){//Arena 
             //printf("Arena!\n");
-			ARENA.setAtt(svgCirc->FloatAttribute("cx"),svgCirc->FloatAttribute("cy"),svgCirc->IntAttribute("id"),svgCirc->FloatAttribute("r"),svgCirc->Attribute("fill"));
+			ARENA.setAtt(svgCirc->FloatAttribute("cx"),svgCirc->FloatAttribute("cy"),svgCirc->IntAttribute("id"),svgCirc->FloatAttribute("r"),svgCirc->Attribute("fill"),0);
         }
         if (fill == "red"){//Inimigo Aéreo
             //printf("Aereo!\n");
 			Nave a;
-			a.setAtt(svgCirc->FloatAttribute("cx"),svgCirc->FloatAttribute("cy"),svgCirc->IntAttribute("id"),svgCirc->FloatAttribute("r"),svgCirc->Attribute("fill"));
+			a.setAtt(svgCirc->FloatAttribute("cx"),svgCirc->FloatAttribute("cy"),svgCirc->IntAttribute("id"),svgCirc->FloatAttribute("r"),svgCirc->Attribute("fill"),0);
 			INIMIGO_A.push_back(a);
         }
         if (fill == "orange"){//Inimigo Terrestre
             //printf("Terrestre!\n");
 			Nave a;
-			a.setAtt(svgCirc->FloatAttribute("cx"),svgCirc->FloatAttribute("cy"),svgCirc->IntAttribute("id"),svgCirc->FloatAttribute("r"),svgCirc->Attribute("fill"));
+			a.setAtt(svgCirc->FloatAttribute("cx"),svgCirc->FloatAttribute("cy"),svgCirc->IntAttribute("id"),svgCirc->FloatAttribute("r"),svgCirc->Attribute("fill"),0);
 			INIMIGO_T.push_back(a);
         }
         svgCirc = svgCirc->NextSiblingElement("circle");
@@ -123,8 +126,12 @@ void read_xml(char* FileName){
 		pistaDeVoo1.distAbs = sqrt(pow(pistaDeVoo1.distx,2)+pow(pistaDeVoo1.disty,2));
 		accelx = 2*pistaDeVoo1.distx/pow(4000,2.0);
 		accely = 2*pistaDeVoo1.disty/pow(4000,2.0);
+		
+		JOGADOR.tan_now = atan2(pistaDeVoo1.disty,pistaDeVoo1.distx);
 
     }
+	VelRef = velocidade*4000*(pistaDeVoo1.distAbs*2)/pow(4000,2);
+
     
 }
 
@@ -148,6 +155,7 @@ int main(int argc, char**argv)
    
     //Main Loop 
 	glutMainLoop();
+	
 	return 0;
 }
 
@@ -173,8 +181,12 @@ void keyPressDown(unsigned char key, int x, int y)
   keyStatus[key] = true;
 }
 
+
 void idle(void){
-	float VelFin;
+	/*float VelFin;
+	
+	VelFin = velocidade*4000*(pistaDeVoo1.distAbs*2)/pow(4000,2);
+	printf("%f\t%f\n", VelFin, VelRef);*/
 	float meio = pistaDeVoo1.pos1_x + pistaDeVoo1.distx/2;
 	if(ready && !decolado){
 		if(glutGet(GLUT_ELAPSED_TIME)-t0<=4000){
@@ -187,65 +199,44 @@ void idle(void){
 		}
 		else {decolado = true;}
 	}
-	
-	VelFin = velocidade*4000*(pistaDeVoo1.distAbs*2)/pow(4000,2);
-
-	if((keyStatus['w'] || keyStatus['W']) && decolado && distanciaAereo(JOGADOR.pos_x,JOGADOR.pos_y-VelFin)
-	&& distanciaArena(JOGADOR.pos_x,JOGADOR.pos_y-VelFin))
-		if(keyStatus['a']||keyStatus['A']||keyStatus['s']||keyStatus['S']||keyStatus['d']||keyStatus['D'] 
-		&& distanciaAereo(JOGADOR.pos_x,JOGADOR.pos_y-VelFin/sqrt(2)) && distanciaArena(JOGADOR.pos_x,JOGADOR.pos_y-VelFin/sqrt(2)))
-		{
-    		JOGADOR.pos_y-= VelFin/sqrt(2);
+	if( keyStatus['-'] ){
+		if(VelFin-velocidade>0){
+			VelRef-=velocidade;		
 		}
-		else{
-			JOGADOR.pos_y-= VelFin;
-		}
-
-  	if((keyStatus['a'] || keyStatus['A']) && decolado && distanciaAereo(JOGADOR.pos_x-VelFin,JOGADOR.pos_y)
-	&& distanciaArena(JOGADOR.pos_x - VelFin,JOGADOR.pos_y))
-    	if(keyStatus['w']||keyStatus['W']||keyStatus['s']||keyStatus['S']||keyStatus['d']||keyStatus['D']
-		&& distanciaAereo(JOGADOR.pos_x-VelFin/sqrt(2),JOGADOR.pos_y) && distanciaArena(JOGADOR.pos_x-VelFin/sqrt(2),JOGADOR.pos_y))
-		{
-    		JOGADOR.pos_x-= VelFin/sqrt(2);
-		}
-		else{
-			JOGADOR.pos_x-= VelFin;
-		}
-
-  	if((keyStatus['s'] || keyStatus['S']) && decolado 
-		&& distanciaAereo(JOGADOR.pos_x, JOGADOR.pos_y+VelFin) 
-		&& distanciaArena(JOGADOR.pos_x, JOGADOR.pos_y+VelFin))
-    	if(keyStatus['w']||keyStatus['W']||keyStatus['a']||keyStatus['A']||keyStatus['d']||keyStatus['D']
-		&& distanciaAereo(JOGADOR.pos_x, JOGADOR.pos_y+VelFin/sqrt(2)) 
-		&& distanciaArena(JOGADOR.pos_x, JOGADOR.pos_y+VelFin/sqrt(2)))
-		{
-    		JOGADOR.pos_y+= VelFin/sqrt(2);
-		}
-		else{
-			JOGADOR.pos_y+= VelFin;
-		}
-
-  	if((keyStatus['d'] || keyStatus['D']) && decolado 
-		&& distanciaAereo(JOGADOR.pos_x+ VelFin/sqrt(2),JOGADOR.pos_y) 
-		&& distanciaArena(JOGADOR.pos_x+ VelFin/sqrt(2),JOGADOR.pos_y))
-    	if(keyStatus['w']||keyStatus['W']||keyStatus['a']||keyStatus['A']||keyStatus['s']||keyStatus['S']
-		&& distanciaAereo(JOGADOR.pos_x+ VelFin,JOGADOR.pos_y) 
-		&& distanciaArena(JOGADOR.pos_x+ VelFin,JOGADOR.pos_y))
-		{
-    		JOGADOR.pos_x+= VelFin/sqrt(2);
-		}
-		else{
-			JOGADOR.pos_x+= VelFin;
-		}
-
-
-  glutPostRedisplay();
+	}
+	if( keyStatus['+'] ){
+		VelRef+=velocidade;
+	}
+  	if((keyStatus['a'] || keyStatus['A']) && decolado )
+	{
+    	glPushMatrix();
+    	glTranslatef(JOGADOR.pos_x, JOGADOR.pos_y,0);
+		JOGADOR.tan_now-= PI/48;
+		glRotatef(JOGADOR.tan_now*180/PI,0,0,1);
+		glPopMatrix();
+	}
+  	if((keyStatus['d'] || keyStatus['D']) && decolado)
+	{
+		glPushMatrix();
+    	glTranslatef(JOGADOR.pos_x, JOGADOR.pos_y,0);
+		JOGADOR.tan_now+= PI/48;
+		glRotatef(JOGADOR.tan_now*180/PI,0,0,1);
+		glPopMatrix();
+	}
+	if(decolado && distanciaAereo(JOGADOR.pos_x + cos(JOGADOR.tan_now)*VelRef, JOGADOR.pos_y+sin(JOGADOR.tan_now)*VelRef)){
+		JOGADOR.pos_x+= cos(JOGADOR.tan_now)*VelRef;
+		JOGADOR.pos_y+= sin(JOGADOR.tan_now)*VelRef;
+	}
+	else{
+		//JOGO RECOMEÇA	
+	}
+  	glutPostRedisplay();
 }
 
 
 void display(void){
     
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glColor3f(1,1,1);
 	
 	//ARENA
@@ -266,30 +257,24 @@ void display(void){
 	
 
 	//INIMIGO_A
-	for(int j=0; j<(INIMIGO_A.size()); j++){                
-    	/*glBegin(GL_POLYGON);
-        glColor3f(1, 0, 0);
-        for(i = 0; i < circle_points; i++) {
-        	angle = (2*PI*i)/circle_points;
-        	glVertex2f(INIMIGO_A[j].pos_x+INIMIGO_A[j].radius*cos(angle),INIMIGO_A[j].pos_y+INIMIGO_A[j].radius*sin(angle));
-        }
-        glEnd();*/
-		INIMIGO_T[j].desenhaNave(angle, circle_points);
+	for(int j=0; j<(INIMIGO_A.size()); j++){
+		glPushMatrix();                
+    	INIMIGO_A[j].desenhaNave();
+		glPopMatrix();
     }
 	//INIMIGO_T
 	for(int j=0; j<(INIMIGO_T.size()); j++){                
-    	/*glBegin(GL_POLYGON);
-        glColor3f(1, 0.5, 0);
-        for(i = 0; i < circle_points; i++) {
-        	angle = (2*PI*i)/circle_points;
-        	glVertex2f(INIMIGO_T[j].pos_x+INIMIGO_T[j].radius*cos(angle),INIMIGO_T[j].pos_y+INIMIGO_T[j].radius*sin(angle));
-        }
-        glEnd();*/
-		INIMIGO_T[j].desenhaNave(angle, circle_points);
+		glPushMatrix();		
+		INIMIGO_T[j].desenhaNave();
+		glPopMatrix();
     }
 
 	//JOGADOR
-    JOGADOR.desenhaNave(angle, circle_points);
+	//glPushMatrix();
+    JOGADOR.desenhaNave();
+	//glPopMatrix();
+	glutPostRedisplay();
+	glFlush();
 }
 
 bool distanciaArena(float x, float y){
