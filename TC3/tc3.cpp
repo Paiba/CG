@@ -258,7 +258,7 @@ void idle(void){
 	{
     	glPushMatrix();
     	glTranslatef(JOGADOR.pos_x, JOGADOR.pos_y,0);
-		JOGADOR.tan_now-= PI/48;
+		JOGADOR.tan_now-= PI/100;
 		glRotatef(JOGADOR.tan_now*180/PI,0,0,1);
 		glPopMatrix();
 	}
@@ -266,7 +266,7 @@ void idle(void){
 	{
 		glPushMatrix();
     	glTranslatef(JOGADOR.pos_x, JOGADOR.pos_y,0);
-		JOGADOR.tan_now+= PI/48;
+		JOGADOR.tan_now+= PI/100;
 		glRotatef(JOGADOR.tan_now*180/PI,0,0,1);
 		glPopMatrix();
 	}

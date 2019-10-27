@@ -59,7 +59,7 @@ void Nave::desenhaCanhao(float a, float b){
 		glLineWidth(3);
 		glBegin(GL_LINES);
 			glVertex2f(radius, 0);
-			glVertex2f(radius+radius/1.5, 0+);
+			glVertex2f(radius+radius/1.5, 0+0);
 		glEnd();
 }
 //DETALHES
