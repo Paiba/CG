@@ -58,13 +58,15 @@ void Nave::desenhaHelix(float a, float b){
 
 void Nave::desenhaNave(){
 	
-	if(cor == "green"){
-		//desenhaCirculoEli(radius,1,1,1,1);  -- Hitbox
-		glPushMatrix();		
-		desenhaCirculoEli(radius,0,1,0,0.3);
+	if(cor == "green"){  
+		glPushMatrix();	
+			desenhaCirculoEli(radius,1,1,1,1);	//-- Hitbox
 		glPopMatrix();
 		glPushMatrix();
-		desenhaHelix((pos_x+radius/2),(pos_y+radius/2));
+			desenhaCirculoEli(radius,0,1,0,0.3); // --Corpo da Nave
+		glPopMatrix();
+		glPushMatrix();
+			desenhaHelix((pos_x),(pos_y));
 		glPopMatrix();
 	}
 	if(cor == "red"){

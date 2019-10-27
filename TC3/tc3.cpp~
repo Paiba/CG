@@ -21,6 +21,7 @@ void init(void);
 void idle(void);
 void keyPressDown(unsigned char, int, int);
 void keyPressUp(unsigned char,int,int);
+void reseta();
 
 float TamFin;
 float angle;
@@ -60,6 +61,7 @@ pista pistaDeVoo1;
 float accelx, accely;
 
 Nave JOGADOR;
+Nave AUX;
 Nave ARENA;
 vector<Nave> INIMIGO_T;
 vector<Nave> INIMIGO_A;
@@ -132,7 +134,7 @@ void read_xml(char* FileName){
     }
 	VelRef = velocidade*4000*(pistaDeVoo1.distAbs*2)/pow(4000,2);
 
-    
+    AUX = JOGADOR;
 }
 
 
@@ -183,10 +185,6 @@ void keyPressDown(unsigned char key, int x, int y)
 
 
 void idle(void){
-	/*float VelFin;
-	
-	VelFin = velocidade*4000*(pistaDeVoo1.distAbs*2)/pow(4000,2);
-	printf("%f\t%f\n", VelFin, VelRef);*/
 	float meio = pistaDeVoo1.pos1_x + pistaDeVoo1.distx/2;
 	if(ready && !decolado){
 		if(glutGet(GLUT_ELAPSED_TIME)-t0<=4000){
@@ -200,12 +198,15 @@ void idle(void){
 		else {decolado = true;}
 	}
 	if( keyStatus['-'] ){
-		if(VelFin-velocidade>0){
-			VelRef-=velocidade;		
+		if(VelRef-velocidade>0){
+			VelRef-=velocidade/4;		
 		}
 	}
+	if(keyStatus['r'] || keyStatus['R']){
+		reseta();
+	}
 	if( keyStatus['+'] ){
-		VelRef+=velocidade;
+		VelRef+=velocidade/4;
 	}
   	if((keyStatus['a'] || keyStatus['A']) && decolado )
 	{
@@ -227,8 +228,8 @@ void idle(void){
 		JOGADOR.pos_x+= cos(JOGADOR.tan_now)*VelRef;
 		JOGADOR.pos_y+= sin(JOGADOR.tan_now)*VelRef;
 	}
-	else{
-		//JOGO RECOMEÇA	
+	else if(decolado){
+		reseta();
 	}
   	glutPostRedisplay();
 }
@@ -297,4 +298,8 @@ bool distanciaAereo(float x, float y){
     
 }
 
-
+void reseta(){
+	JOGADOR = AUX;
+	decolado = false;
+	ready =  false;
+}
