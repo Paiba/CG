@@ -223,19 +223,19 @@ void keyPressDown(unsigned char key, int x, int y)
 //------------ MOUSE
 void mouseClick(int button, int  state, int x, int y){
 	if(decolado){
+		float vel = VelRef;
 		if(button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && glutGet(GLUT_ELAPSED_TIME)-tb>4000 ){
 				tb = glutGet(GLUT_ELAPSED_TIME);            		
 				BOMBA.setAtt(JOGADOR.pos_x, JOGADOR.pos_y, 0.3*JOGADOR.radius , JOGADOR.tan_now, 'b');
-				BOMBA.velocidade = VelRef;
+				BOMBA.velocidade = vel;
             }
 		if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
 				fogo =  true;		
 		}
 		if(button == GLUT_LEFT_BUTTON && state == GLUT_UP && fogo){
-				float auxVel= VelRef;
 				Proj at;
 				at.setAtt(JOGADOR.pos_x, JOGADOR.pos_y, 0.1*JOGADOR.radius , (JOGADOR.tan_now + JOGADOR.desl_can), 't');
-				at.velocidade = VelRef*veloTiro;
+				at.velocidade = vel*veloTiro;
 				TIRO.push_back(at);
 		}                      
      }
