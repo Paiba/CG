@@ -9,7 +9,6 @@ public:
     int id;
     string cor;
 	float tan_now;
-	float tan_can;
 	float desl_can;
 
     Nave();

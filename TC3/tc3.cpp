@@ -11,6 +11,7 @@
 #include <cmath>
 #include "tinyxml2.h"
 #include "nave.hpp"
+#include "proj.hpp"
 
 using namespace std;
 using namespace tinyxml2;
@@ -29,7 +30,7 @@ void transporta();
 float TamFin;
 float angle;
 int i, circle_points = 1000;
-float t0, t1, t2;
+float t0, t1, t2, tb;
 float oldX;
 
 bool distanciaAereo(float, float);
@@ -68,6 +69,9 @@ Nave AUX;
 Nave ARENA;
 vector<Nave> INIMIGO_T;
 vector<Nave> INIMIGO_A;
+
+Proj BOMBA;
+vector<Proj> TIRO;
 
 
 void read_xml(char* FileName){
@@ -211,8 +215,12 @@ void keyPressDown(unsigned char key, int x, int y)
 //------------ MOUSE
 void mouseClick(int button, int  state, int x, int y){
 	if(decolado){
-	
-	}
+		 if(button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && glutGet(GLUT_ELAPSED_TIME)-tb>4000 ){
+				tb = glutGet(GLUT_ELAPSED_TIME);            		
+				BOMBA.setAtt(JOGADOR.pos_x, JOGADOR.pos_y, 0.3*JOGADOR.radius , JOGADOR.tan_now, 'b');
+				BOMBA.velocidade = VelRef;
+            }                       
+     }
 }
 void mouseMove(int x, int y){
 	if(decolado){
@@ -245,7 +253,7 @@ void idle(void){
 	}
 	if( keyStatus['-'] && decolado){
 		if(VelRef-velocidade>0){
-			VelRef-=velocidade/4;		
+			VelRef-= velocidade/4;		
 		}
 	}
 	if(keyStatus['r'] || keyStatus['R']){
@@ -282,6 +290,13 @@ void idle(void){
 	else if(decolado){		
 		reseta();
 	}
+	if(glutGet(GLUT_ELAPSED_TIME)-tb<=4000){
+		BOMBA.radius = (4000-(glutGet(GLUT_ELAPSED_TIME)-tb))/4000*0.3*JOGADOR.radius/2+JOGADOR.radius/2;
+		BOMBA.pos_x+= cos(BOMBA.tan_now)*BOMBA.velocidade;
+		BOMBA.pos_y+= sin(BOMBA.tan_now)*BOMBA.velocidade;
+	}
+	else BOMBA.radius=0;
+
   	glutPostRedisplay();
 }
 
@@ -322,11 +337,19 @@ void display(void){
 		glPopMatrix();
     }
 	glColor3f(1,1,1);
+	//PROJETEIS
+	if(BOMBA.radius>0)
+		BOMBA.desenhaProj();
+	else
+		BOMBA.velocidade=0;
 
 	//JOGADOR
 	//glPushMatrix();
     JOGADOR.desenhaNave();
 	//glPopMatrix();
+
+	
+
 	glutPostRedisplay();
 	glFlush();
 }
@@ -376,4 +399,5 @@ void reseta(){
 	decolado = false;
 	ready =  false;
 	VelRef = velocidade*4000*(pistaDeVoo1.distAbs*2)/pow(4000,2);
+	BOMBA.radius=0;
 }

@@ -10,6 +10,7 @@ public:
     string cor;
 	float tan_now;
 	float desl_can;
+	float velocidade;
 
     Nave();
     void setAtt(float x, float y, int iD, float raio, string fill, float tangente);

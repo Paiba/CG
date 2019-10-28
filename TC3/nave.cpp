@@ -26,6 +26,7 @@ void Nave::setAtt(float x, float y, int iD, float raio, string fill, float tange
     cor = fill;
 	tan_now = tangente;
 	desl_can = 0;
+	velocidade = 0;
 }
 //CORPO DA NAVE
 void Nave::desenhaCirculoEli(float raio, float r, float g, float b, float elip){
@@ -41,25 +42,15 @@ void Nave::desenhaCirculoEli(float raio, float r, float g, float b, float elip){
 	}		
 	glEnd();
 }
-//HÉLICE
-void Nave::desenhaHelix(float a, float b){
-		glTranslatef(a, b, 0);
-		glRotatef(tan_now*180/PI,0,0,1);
-		glColor3f(0, 0, 0);	
-		glBegin(GL_POLYGON);
-			glVertex2f(0,0);
-			glVertex2f(-radius/4,+radius/4);
-			glVertex2f(-radius/4,-radius/4);		
-		glEnd();
-}
+
 //CANHÃO
 void Nave::desenhaCanhao(float a, float b){
 		glTranslatef(a, b, 0);
-		glRotatef((tan_now)*180/PI,0,0,1);
+		glRotatef((tan_now+desl_can)*180/PI,0,0,1);
 		glLineWidth(3);
 		glBegin(GL_LINES);
 			glVertex2f(radius, 0);
-			glVertex2f(radius+radius/1.5, 0+0);
+			glVertex2f(radius+(radius/1.5),0);
 		glEnd();
 }
 //DETALHES
@@ -99,14 +90,37 @@ void Nave:: desenhaAsa(float a, float b){
 			glVertex2f(0,0.9*radius);		
 		glEnd();
 }
+
+//HÉLICE
+void Nave::desenhaHelix(float a, float b){
+		glTranslatef(a, b, 0);
+		glRotatef(tan_now*180/PI,0,0,1);
+		glRotatef(180/PI*velocidade,0,1,0);
+		glColor3f(1, 1, 0);	
+		glBegin(GL_POLYGON);
+			glVertex2f(radius/2,radius/2);
+			glVertex2f(radius/2+radius/4,radius/2+radius/4);
+			glVertex2f(radius/2+radius/4,radius/2-radius/4);
+			glVertex2f(radius/2-radius/4,radius/2+radius/4);
+			glVertex2f(radius/2-radius/4,radius/2-radius/4);			
+		glEnd();
+		glBegin(GL_POLYGON);
+			glVertex2f(radius/2,-radius/2);
+			glVertex2f(radius/2+radius/4,-radius/2+radius/4);
+			glVertex2f(radius/2+radius/4,-radius/2-radius/4);
+			glVertex2f(radius/2-radius/4,-radius/2+radius/4);
+			glVertex2f(radius/2-radius/4,-radius/2-radius/4);			
+		glEnd();
+}
+
 //DESENHO DA NAVE INTEIRA
 void Nave::desenhaNave(){
 	
 	if(cor == "green"){
 		//-- Hitbox
-		glPushMatrix();	
+		/*glPushMatrix();	
 			desenhaCirculoEli(radius,1,1,1,1);	
-		glPopMatrix();
+		glPopMatrix();*/
 		 //-- Asas da nave
 		glPushMatrix();
 			desenhaAsa(pos_x,pos_y);
@@ -123,6 +137,11 @@ void Nave::desenhaNave(){
 		glPushMatrix();
 			desenhaCanhao(pos_x,pos_y); 
 		glPopMatrix();
+		//
+		glPushMatrix();
+			desenhaHelix(pos_x, pos_y); 
+		glPopMatrix();
+		
 	}
 	if(cor == "red"){
 		glTranslatef(pos_x, pos_y, 0);
