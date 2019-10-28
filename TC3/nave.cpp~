@@ -75,7 +75,7 @@ void Nave::desenhaDet(float a, float b){
 //ASA
 void Nave:: desenhaAsa(float a, float b){
 		glTranslatef(a, b, 0);
-		glRotatef(this.tan_now*180/PI,0,0,1);
+		glRotatef(tan_now*180/PI,0,0,1);
 		glColor3f(0, 0, 0);	
 		glBegin(GL_POLYGON);
 			glVertex2f(radius/4,0);

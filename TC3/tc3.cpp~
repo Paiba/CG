@@ -167,6 +167,8 @@ void read_xml(char* FileName){
 	ARENA.pos_x-= ARENA.pos_x;
 	ARENA.pos_y-= ARENA.pos_y;
 
+	JOGADOR.velocidade = VelRef;
+
 	AUX = JOGADOR;
 	for(int j=0; j<(TIRO.size()); j++){
 		TIRO[j].radius=0;
@@ -223,11 +225,10 @@ void keyPressDown(unsigned char key, int x, int y)
 //------------ MOUSE
 void mouseClick(int button, int  state, int x, int y){
 	if(decolado){
-		float vel = VelRef;
 		if(button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && glutGet(GLUT_ELAPSED_TIME)-tb>4000 ){
 				tb = glutGet(GLUT_ELAPSED_TIME);            		
 				BOMBA.setAtt(JOGADOR.pos_x, JOGADOR.pos_y, 0.3*JOGADOR.radius , JOGADOR.tan_now, 'b');
-				BOMBA.velocidade = vel;
+				BOMBA.velocidade = JOGADOR.velocidade;
             }
 		if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
 				fogo =  true;		
@@ -235,7 +236,7 @@ void mouseClick(int button, int  state, int x, int y){
 		if(button == GLUT_LEFT_BUTTON && state == GLUT_UP && fogo){
 				Proj at;
 				at.setAtt(JOGADOR.pos_x, JOGADOR.pos_y, 0.1*JOGADOR.radius , (JOGADOR.tan_now + JOGADOR.desl_can), 't');
-				at.velocidade = vel*veloTiro;
+				at.velocidade = VelRef*veloTiro;
 				TIRO.push_back(at);
 		}                      
      }
@@ -271,7 +272,8 @@ void idle(void){
 	}
 	if( keyStatus['-'] && decolado){
 		if(VelRef-velocidade/1000>0){
-			JOGADOR.velocidade-= velocidade/1000;		
+			JOGADOR.velocidade-= velocidade/1000;
+			VelRef-= velocidade/1000		
 		}
 	}
 	if(keyStatus['r'] || keyStatus['R']){
@@ -279,6 +281,7 @@ void idle(void){
 	}
 	if( keyStatus['+'] && decolado ){
 		JOGADOR.velocidade+= velocidade/1000;
+		VelRef+= velocidade/1000
 	}
   	if((keyStatus['a'] || keyStatus['A']) && decolado )
 	{

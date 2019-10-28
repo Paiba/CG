@@ -95,7 +95,6 @@ void Nave:: desenhaAsa(float a, float b){
 void Nave::desenhaHelix(float a, float b){
 		glTranslatef(a, b, 0);
 		glRotatef(tan_now*180/PI,0,0,1);
-		glRotatef(180/PI*velocidade,0,1,0);
 		glColor3f(1, 1, 0);	
 		glBegin(GL_POLYGON);
 			glVertex2f(radius/2,radius/2);
