@@ -219,7 +219,10 @@ void mouseClick(int button, int  state, int x, int y){
 				tb = glutGet(GLUT_ELAPSED_TIME);            		
 				BOMBA.setAtt(JOGADOR.pos_x, JOGADOR.pos_y, 0.3*JOGADOR.radius , JOGADOR.tan_now, 'b');
 				BOMBA.velocidade = VelRef;
-            }                       
+            } 
+		if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+			
+		}                      
      }
 }
 void mouseMove(int x, int y){
