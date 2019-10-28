@@ -223,11 +223,10 @@ void keyPressDown(unsigned char key, int x, int y)
 //------------ MOUSE
 void mouseClick(int button, int  state, int x, int y){
 	if(decolado){
-		float vel = VelRef;
 		if(button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && glutGet(GLUT_ELAPSED_TIME)-tb>4000 ){
 				tb = glutGet(GLUT_ELAPSED_TIME);            		
 				BOMBA.setAtt(JOGADOR.pos_x, JOGADOR.pos_y, 0.3*JOGADOR.radius , JOGADOR.tan_now, 'b');
-				BOMBA.velocidade = vel;
+				BOMBA.velocidade = JOGADOR.velocidade;
             }
 		if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
 				fogo =  true;		
@@ -235,7 +234,7 @@ void mouseClick(int button, int  state, int x, int y){
 		if(button == GLUT_LEFT_BUTTON && state == GLUT_UP && fogo){
 				Proj at;
 				at.setAtt(JOGADOR.pos_x, JOGADOR.pos_y, 0.1*JOGADOR.radius , (JOGADOR.tan_now + JOGADOR.desl_can), 't');
-				at.velocidade = vel*veloTiro;
+				at.velocidade = JOGADOR.velocidade*veloTiro;
 				TIRO.push_back(at);
 		}                      
      }
@@ -271,14 +270,14 @@ void idle(void){
 	}
 	if( keyStatus['-'] && decolado){
 		if(VelRef-velocidade/1000>0){
-			VelRef-= velocidade/1000;		
+			JOGADOR.velocidade-= velocidade/1000;		
 		}
 	}
 	if(keyStatus['r'] || keyStatus['R']){
 		reseta();
 	}
 	if( keyStatus['+'] && decolado ){
-		VelRef+=velocidade/1000;
+		JOGADOR.velocidade+= velocidade/1000;
 	}
   	if((keyStatus['a'] || keyStatus['A']) && decolado )
 	{
@@ -296,10 +295,10 @@ void idle(void){
 		glRotatef(JOGADOR.tan_now*180/PI,0,0,1);
 		glPopMatrix();
 	}
-	if(decolado && distanciaAereo(JOGADOR.pos_x + cos(JOGADOR.tan_now)*VelRef, JOGADOR.pos_y+sin(JOGADOR.tan_now)*VelRef)){
-		if(distanciaArena(JOGADOR.pos_x + cos(JOGADOR.tan_now)*VelRef,JOGADOR.pos_y + sin(JOGADOR.tan_now)*VelRef)){
-			JOGADOR.pos_x+= cos(JOGADOR.tan_now)*VelRef;
-			JOGADOR.pos_y+= sin(JOGADOR.tan_now)*VelRef;
+	if(decolado && distanciaAereo(JOGADOR.pos_x + cos(JOGADOR.tan_now)*JOGADOR.velocidade, JOGADOR.pos_y+sin(JOGADOR.tan_now)*JOGADOR.velocidade)){
+		if(distanciaArena(JOGADOR.pos_x + cos(JOGADOR.tan_now)*JOGADOR.velocidade,JOGADOR.pos_y + sin(JOGADOR.tan_now)*JOGADOR.velocidade)){
+			JOGADOR.pos_x+= cos(JOGADOR.tan_now)*JOGADOR.velocidade;
+			JOGADOR.pos_y+= sin(JOGADOR.tan_now)*JOGADOR.velocidade;
 		}
 		else{
 			transporta();			
