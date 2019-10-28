@@ -30,7 +30,8 @@ void transporta();
 float TamFin;
 float angle;
 int i, circle_points = 1000;
-float t0, t1, t2, tb;
+float t0, t1, t2, tb; 
+int tt=0;
 float oldX;
 
 bool distanciaAereo(float, float);
@@ -39,9 +40,11 @@ bool decolado = false;
 bool keyStatus[255];
 bool ready = false;
 bool move =  false;
+bool fogo =  false;
 
 float VelRef;
 float velocidade;
+float veloTiro;
 string nom;
 string tip;
 string caminh;
@@ -74,6 +77,7 @@ Proj BOMBA;
 vector<Proj> TIRO;
 
 
+
 void read_xml(char* FileName){
 	XMLDocument doc;
 	doc.LoadFile(strcat(FileName, "config.xml"));
@@ -90,6 +94,7 @@ void read_xml(char* FileName){
 	caminh = pElement->GetText();    
     pElement = pRoot->FirstChildElement("jogador");
     velocidade = pElement->FloatAttribute("vel");
+	veloTiro = pElement->FloatAttribute("velTiro");
     caminhoInteiro = caminh +  nom + "." + tip;
     XMLDocument doc1;
 	doc1.LoadFile(caminhoInteiro.c_str());
@@ -163,6 +168,9 @@ void read_xml(char* FileName){
 	ARENA.pos_y-= ARENA.pos_y;
 
 	AUX = JOGADOR;
+	for(int j=0; j<(TIRO.size()); j++){
+		TIRO[j].radius=0;
+	}
 	 
 }
 
@@ -215,13 +223,20 @@ void keyPressDown(unsigned char key, int x, int y)
 //------------ MOUSE
 void mouseClick(int button, int  state, int x, int y){
 	if(decolado){
-		 if(button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && glutGet(GLUT_ELAPSED_TIME)-tb>4000 ){
+		if(button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && glutGet(GLUT_ELAPSED_TIME)-tb>4000 ){
 				tb = glutGet(GLUT_ELAPSED_TIME);            		
 				BOMBA.setAtt(JOGADOR.pos_x, JOGADOR.pos_y, 0.3*JOGADOR.radius , JOGADOR.tan_now, 'b');
 				BOMBA.velocidade = VelRef;
-            } 
+            }
 		if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-			
+				fogo =  true;		
+		}
+		if(button == GLUT_LEFT_BUTTON && state == GLUT_UP && fogo){
+				float auxVel= VelRef;
+				Proj at;
+				at.setAtt(JOGADOR.pos_x, JOGADOR.pos_y, 0.1*JOGADOR.radius , (JOGADOR.tan_now + JOGADOR.desl_can), 't');
+				at.velocidade = VelRef*veloTiro;
+				TIRO.push_back(at);
 		}                      
      }
 }
@@ -255,15 +270,15 @@ void idle(void){
 		else {decolado = true;}
 	}
 	if( keyStatus['-'] && decolado){
-		if(VelRef-velocidade>0){
-			VelRef-= velocidade/4;		
+		if(VelRef-velocidade/1000>0){
+			VelRef-= velocidade/1000;		
 		}
 	}
 	if(keyStatus['r'] || keyStatus['R']){
 		reseta();
 	}
 	if( keyStatus['+'] && decolado ){
-		VelRef+=velocidade/4;
+		VelRef+=velocidade/1000;
 	}
   	if((keyStatus['a'] || keyStatus['A']) && decolado )
 	{
@@ -294,12 +309,13 @@ void idle(void){
 		reseta();
 	}
 	if(glutGet(GLUT_ELAPSED_TIME)-tb<=4000){
-		BOMBA.radius = (4000-(glutGet(GLUT_ELAPSED_TIME)-tb))/4000*0.3*JOGADOR.radius/2+JOGADOR.radius/2;
+		BOMBA.radius = (4000-(glutGet(GLUT_ELAPSED_TIME)-tb))/4000*0.3*JOGADOR.radius/2+0.3*JOGADOR.radius/2;
 		BOMBA.pos_x+= cos(BOMBA.tan_now)*BOMBA.velocidade;
 		BOMBA.pos_y+= sin(BOMBA.tan_now)*BOMBA.velocidade;
 	}
 	else BOMBA.radius=0;
-
+	
+	
   	glutPostRedisplay();
 }
 
@@ -345,6 +361,17 @@ void display(void){
 		BOMBA.desenhaProj();
 	else
 		BOMBA.velocidade=0;
+	for(int j=0; j<(TIRO.size()); j++){                		
+		glPushMatrix();
+		TIRO[j].desenhaProj();
+		glPopMatrix();
+		if(distanciaArena(TIRO[j].pos_x + TIRO[j].radius,TIRO[j].pos_y + TIRO[j].radius)){
+			TIRO[j].pos_x+= cos(TIRO[j].tan_now)*TIRO[j].velocidade;
+			TIRO[j].pos_y+= sin(TIRO[j].tan_now)*TIRO[j].velocidade;
+		}
+		else TIRO[j].radius=0;	
+		
+    }
 
 	//JOGADOR
 	//glPushMatrix();
@@ -378,23 +405,16 @@ bool distanciaAereo(float x, float y){
 }
 
 void transporta(){
-	float ang = tan(JOGADOR.tan_now*180/PI);
-	float x = JOGADOR.pos_x, y= JOGADOR.pos_y, r=ARENA.radius;
-	
-	float x1= (1/(ang*ang+1))*(sqrt(-x*x+2*x*y*ang-y*y*ang*ang+ang*ang*r*r+r*r)-x*ang+y*ang*ang);
-	float y1= (1/(ang*ang+1))*(ang*sqrt(-x*x+2*x*y*ang-y*y*ang*ang+ang*ang*r*r+r*r)+x-y*ang);
-	float x2= (1/(ang*ang+1))*(-sqrt(-x*x+2*x*y*ang-y*y*ang*ang+ang*ang*r*r+r*r)-x*ang+y*ang*ang);
-	float y2= (1/(ang*ang+1))*(-ang*sqrt(-x*x+2*x*y*ang-y*y*ang*ang+ang*ang*r*r+r*r)+x-y*ang);
+/*
 
-	printf("%f\n", JOGADOR.pos_x);
 	if( sqrt(pow((x1-JOGADOR.pos_x),2.0) + pow((y1-JOGADOR.pos_y),2.0)) > sqrt(pow((x2-JOGADOR.pos_x),2.0) + pow((y2-JOGADOR.pos_y),2.0))){	
-		JOGADOR.pos_x = x1+cos(JOGADOR.tan_now)*VelRef;
-		JOGADOR.pos_y = y1+sin(JOGADOR.tan_now)*VelRef;
+		JOGADOR.pos_x = x1+cos(JOGADOR.tan_now)*4*JOGADOR.radius;
+		JOGADOR.pos_y = y1+sin(JOGADOR.tan_now)*4*JOGADOR.radius;
 	}
 	else{
-		JOGADOR.pos_x = x2+cos(JOGADOR.tan_now)*VelRef;
-		JOGADOR.pos_y = y2+sin(JOGADOR.tan_now)*VelRef;
-	}
+		JOGADOR.pos_x = x2+cos(JOGADOR.tan_now)*4*JOGADOR.radius;
+		JOGADOR.pos_y = y2+sin(JOGADOR.tan_now)*4*JOGADOR.radius;
+	}*/
 }
 
 void reseta(){
@@ -403,4 +423,8 @@ void reseta(){
 	ready =  false;
 	VelRef = velocidade*4000*(pistaDeVoo1.distAbs*2)/pow(4000,2);
 	BOMBA.radius=0;
+	for(int j=0; j<(TIRO.size()); j++){
+		TIRO[j].radius=0;
+	}
+	 
 }
