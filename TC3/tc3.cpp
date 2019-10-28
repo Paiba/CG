@@ -357,8 +357,11 @@ void display(void){
     }
 	glColor3f(1,1,1);
 	//PROJETEIS
-	if(BOMBA.radius>0)
+	if(BOMBA.radius>0){
+		glPushMatrix();
 		BOMBA.desenhaProj();
+		glPopMatrix();
+		}
 	else
 		BOMBA.velocidade=0;
 	for(int j=0; j<(TIRO.size()); j++){                		
