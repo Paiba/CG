@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 #include <iostream>
 #include <unistd.h>
+#include <time.h>
 #include <list>
 #include <vector>
 #include <iterator>
@@ -25,7 +26,7 @@ void mouseMove(int x, int y);
 void keyPressDown(unsigned char, int, int);
 void keyPressUp(unsigned char,int,int);
 void reseta();
-void transporta();
+
 
 float TamFin;
 float angle;
@@ -43,13 +44,23 @@ bool move =  false;
 bool fogo =  false;
 
 float VelRef;
+float VelRefInimi;
 float velocidade;
+float velocidadeInimi;
 float veloTiro;
+float veloTiroInimi;
+float freqTiro;
 string nom;
 string tip;
 string caminh;
 string caminhoInteiro;
 
+struct ponto{
+	float pos_x;
+	float pos_y;
+};
+
+ponto transporta(Nave nave);
 
 struct pista{
     float pos1_x;
@@ -71,7 +82,7 @@ Nave JOGADOR;
 Nave AUX;
 Nave ARENA;
 vector<Nave> INIMIGO_T;
-vector<Nave> INIMIGO_A;
+vector<Nave> INIMIGO_A, AUXINA;
 
 Proj BOMBA;
 vector<Proj> TIRO;
@@ -91,7 +102,11 @@ void read_xml(char* FileName){
     tip = pElement->GetText();    
     pElement = pRoot->FirstChildElement("arquivoDaArena");
     pElement = pElement->FirstChildElement("caminho");
-	caminh = pElement->GetText();    
+	caminh = pElement->GetText();
+	pElement = pRoot->FirstChildElement("inimigo");
+    velocidadeInimi = pElement->FloatAttribute("vel");
+	veloTiroInimi = pElement->FloatAttribute("velTiro");
+	freqTiro = pElement->FloatAttribute("freqTiro");      
     pElement = pRoot->FirstChildElement("jogador");
     velocidade = pElement->FloatAttribute("vel");
 	veloTiro = pElement->FloatAttribute("velTiro");
@@ -117,7 +132,7 @@ void read_xml(char* FileName){
         if (fill == "red"){//Inimigo Aéreo
             //printf("Aereo!\n");
 			Nave a;
-			a.setAtt(svgCirc->FloatAttribute("cx"),svgCirc->FloatAttribute("cy"),svgCirc->IntAttribute("id"),svgCirc->FloatAttribute("r"),svgCirc->Attribute("fill"),0);
+			a.setAtt(svgCirc->FloatAttribute("cx"),svgCirc->FloatAttribute("cy"),svgCirc->IntAttribute("id"),svgCirc->FloatAttribute("r"),svgCirc->Attribute("fill"), 0);
 			INIMIGO_A.push_back(a);
         }
         if (fill == "orange"){//Inimigo Terrestre
@@ -151,8 +166,9 @@ void read_xml(char* FileName){
 
     }
 	VelRef = velocidade*4000*(pistaDeVoo1.distAbs*2)/pow(4000,2);
+	VelRefInimi = velocidadeInimi*4000*(pistaDeVoo1.distAbs*2)/pow(4000,2);
 
-    
+    srand(time(NULL));
 	JOGADOR.pos_x-= ARENA.pos_x;
 	JOGADOR.pos_y-= ARENA.pos_y;
 	for(int j=0; j<(INIMIGO_A.size()); j++){                
@@ -168,7 +184,14 @@ void read_xml(char* FileName){
 	ARENA.pos_y-= ARENA.pos_y;
 
 	JOGADOR.velocidade = VelRef;
+	
+	for(int j=0; j<(INIMIGO_A.size()); j++){ 
+		float angulo =  rand() % (100);           
+    	INIMIGO_A[j].tan_now = 2*PI*angulo/100;
+		INIMIGO_A[j].velocidade = VelRefInimi;
+    }
 
+	AUXINA = INIMIGO_A;
 	AUX = JOGADOR;
 	for(int j=0; j<(TIRO.size()); j++){
 		TIRO[j].radius=0;
@@ -305,7 +328,9 @@ void idle(void){
 			JOGADOR.pos_y+= sin(JOGADOR.tan_now)*JOGADOR.velocidade;
 		}
 		else{
-			transporta();			
+			ponto a = transporta(JOGADOR);
+			JOGADOR.pos_x = a.pos_x;
+			JOGADOR.pos_y = a.pos_y;		
 		}
 	}
 	else if(decolado){		
@@ -317,11 +342,27 @@ void idle(void){
 		BOMBA.pos_y+= sin(BOMBA.tan_now)*BOMBA.velocidade;
 	}
 	else BOMBA.radius=0;
-	
-	
+	if(decolado){
+	for(int j=0; j<(INIMIGO_A.size()); j++){
+
+			if(distanciaArena(INIMIGO_A[j].pos_x + cos(INIMIGO_A[j].tan_now)*INIMIGO_A[j].velocidade,INIMIGO_A[j].pos_y + 
+			sin(INIMIGO_A[j].tan_now)*INIMIGO_A[j].velocidade))
+			{
+					INIMIGO_A[j].pos_x+= cos(INIMIGO_A[j].tan_now)*INIMIGO_A[j].velocidade;
+					INIMIGO_A[j].pos_y+= sin(INIMIGO_A[j].tan_now)*INIMIGO_A[j].velocidade;
+			}
+			else{	
+				ponto k = transporta(INIMIGO_A[j]);
+				INIMIGO_A[j].pos_x = k.pos_x;
+				INIMIGO_A[j].pos_y = k.pos_y;
+			}
+		}}
   	glutPostRedisplay();
 }
 
+//--------------------------------------------------------------------
+//DISPLAY
+//--------------------------------------------------------------------
 
 void display(void){
     
@@ -410,21 +451,24 @@ bool distanciaAereo(float x, float y){
     
 }
 
-void transporta(){
-/*
-
-	if( sqrt(pow((x1-JOGADOR.pos_x),2.0) + pow((y1-JOGADOR.pos_y),2.0)) > sqrt(pow((x2-JOGADOR.pos_x),2.0) + pow((y2-JOGADOR.pos_y),2.0))){	
-		JOGADOR.pos_x = x1+cos(JOGADOR.tan_now)*4*JOGADOR.radius;
-		JOGADOR.pos_y = y1+sin(JOGADOR.tan_now)*4*JOGADOR.radius;
-	}
-	else{
-		JOGADOR.pos_x = x2+cos(JOGADOR.tan_now)*4*JOGADOR.radius;
-		JOGADOR.pos_y = y2+sin(JOGADOR.tan_now)*4*JOGADOR.radius;
-	}*/
+ponto transporta(Nave nave){
+		Nave AUX1 = nave;
+		AUX1.pos_x-= cos(nave.tan_now)*nave.velocidade;
+		AUX1.pos_y-= sin(nave.tan_now)*nave.velocidade;
+		while(distanciaArena(AUX1.pos_x,AUX1.pos_y)){
+			AUX1.pos_x-= cos(nave.tan_now)*nave.velocidade;
+			AUX1.pos_y-= sin(nave.tan_now)*nave.velocidade;
+		}
+		ponto a;
+		a.pos_x = AUX1.pos_x;
+		a.pos_y = AUX1.pos_y;
+		return a;
 }
+
 
 void reseta(){
 	JOGADOR = AUX;
+	INIMIGO_A = AUXINA;
 	decolado = false;
 	ready =  false;
 	VelRef = velocidade*4000*(pistaDeVoo1.distAbs*2)/pow(4000,2);

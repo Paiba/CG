@@ -28,12 +28,13 @@ void Nave::setAtt(float x, float y, int iD, float raio, string fill, float tange
 	desl_can = 0;
 	velocidade = 0;
 }
+
 //CORPO DA NAVE
 void Nave::desenhaCirculoEli(float raio, float r, float g, float b, float elip){
-	if(cor == "green"){	
+	if(cor == "green" || cor == "red" ){	
 		glTranslatef(pos_x, pos_y, 0);
 		glRotatef(tan_now*180/PI,0,0,1);
-	}	
+	}		
 	glColor3f(r, g, b);	
 	glBegin(GL_POLYGON);
 	for(int i = 0; i < 1000; i++) {
@@ -117,9 +118,6 @@ void Nave::desenhaNave(){
 	
 	if(cor == "green"){
 		//-- Hitbox
-		/*glPushMatrix();	
-			desenhaCirculoEli(radius,1,1,1,1);	
-		glPopMatrix();*/
 		 //-- Asas da nave
 		glPushMatrix();
 			desenhaAsa(pos_x,pos_y);
@@ -143,8 +141,28 @@ void Nave::desenhaNave(){
 		
 	}
 	if(cor == "red"){
-		glTranslatef(pos_x, pos_y, 0);
-		desenhaCirculoEli(radius,1,0,0,1);
+		//-- Hitbox
+		 //-- Asas da nave
+		glPushMatrix();
+			desenhaAsa(pos_x,pos_y);
+		glPopMatrix();
+		// --Corpo da Nave 
+		glPushMatrix();
+			desenhaCirculoEli(radius,1,0,0,0.3); 
+		glPopMatrix();
+		// --Detalhes da nave
+		glPushMatrix();
+			desenhaDet(pos_x,pos_y); 
+		glPopMatrix();
+		//--Canhão da nave
+		glPushMatrix();
+			desenhaCanhao(pos_x,pos_y); 
+		glPopMatrix();
+		//
+		glPushMatrix();
+			desenhaHelix(pos_x, pos_y); 
+		glPopMatrix();
+		
 	}
 	if(cor =="orange"){		
 		glTranslatef(pos_x, pos_y, 0);

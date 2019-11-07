@@ -6,7 +6,7 @@ full: tiny.o nave.o tc3.o proj.o
 tc3.o:
 	g++ -g -c tc3.cpp -o tc3.o
 
-nave.o:
+proj.o:
 	g++ -g -c proj.cpp -o proj.o
 
 nave.o:
